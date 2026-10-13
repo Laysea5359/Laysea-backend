@@ -162,39 +162,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
     onLogin(session);
   };
 
-  // 1-Click Fast Demo accounts
-  const handleQuickDemoLogin = (role: UserRole) => {
-    if (role === 'client') {
-      onLogin({
-        id: 'USR-CLIENT-01',
-        name: 'คุณสมชาย นรินทร์',
-        role: 'client',
-        phone: '089-112-2334',
-        credits: 2500,
-        avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
-      });
-    } else if (role === 'partner') {
-      onLogin({
-        id: 'USR-PARTNER-01',
-        name: 'พิมพ์ชนก (น้องพิมพ์)',
-        role: 'partner',
-        phone: '084-556-7788',
-        credits: 38400,
-        partnerProfileId: 'partner-1',
-        kycStatus: 'verified',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      });
-    } else {
-      onLogin({
-        id: 'USR-ADMIN-01',
-        name: 'ผู้ดูแลระบบ (Super Admin)',
-        role: 'admin',
-        phone: '02-LAYSEA-SOS',
-        email: 'admin@laysea.com',
-      });
-    }
-  };
-
   return (
     <div className="flex-1 flex flex-col justify-between p-5 bg-slate-950 text-slate-100 overflow-y-auto relative">
       {/* Interactive Simulated SMS Toast Popup */}
@@ -630,42 +597,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
           >
             <Shield className="w-3 h-3 text-slate-500" />
             <span>นโยบายความเป็นส่วนตัว (Privacy Policy) & สิทธิ์ขอลบบัญชี PDPA</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 1-Click Quick Demo Login Section */}
-      <div className="space-y-2 pt-1 border-t border-slate-900">
-        <p className="text-[11px] text-slate-400 text-center font-medium">
-          ⚡ สลับทดสอบได้ทันทีด้วย 1-Click Demo Login:
-        </p>
-
-        <div className="grid grid-cols-3 gap-2 text-[11px]">
-          <button
-            onClick={() => handleQuickDemoLogin('client')}
-            className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-rose-500/40 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
-          >
-            <User className="w-4 h-4 text-rose-400" />
-            <span className="font-semibold text-white">ลูกค้า</span>
-            <span className="text-[9px] text-slate-500">2,500 เครดิต</span>
-          </button>
-
-          <button
-            onClick={() => handleQuickDemoLogin('partner')}
-            className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/40 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
-          >
-            <HeartHandshake className="w-4 h-4 text-amber-400" />
-            <span className="font-semibold text-white">พาร์ทเนอร์</span>
-            <span className="text-[9px] text-emerald-400">KYC ผ่านแล้ว</span>
-          </button>
-
-          <button
-            onClick={() => handleQuickDemoLogin('admin')}
-            className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-purple-500/40 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
-          >
-            <ShieldCheck className="w-4 h-4 text-purple-400" />
-            <span className="font-semibold text-white">แอดมิน</span>
-            <span className="text-[9px] text-purple-300">Google Sheet</span>
           </button>
         </div>
       </div>
