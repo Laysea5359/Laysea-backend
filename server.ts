@@ -684,7 +684,82 @@ app.post('/api/account/delete', (req: Request, res: Response) => {
     deletedAt: new Date().toISOString(),
   });
 });
+// --- ฐานข้อมูลจำลองสำหรับเก็บผู้ใช้ (In-Memory DB) ---
+interface UserAccount {
+  id: string;
+  phone: string;
+  password: string;
+  name: string;
+  role: 'client' | 'partner' | 'admin';
+  credits: number;
+  avatarUrl?: string;
+  kycStatus?: 'pending' | 'verified' | 'rejected';
+}
 
+const usersDB: UserAccount[] = [
+  {
+    id: 'USR-ADMIN-01',
+    phone: '0800000000',
+    password: 'adminpassword123',
+    name: 'Admin Supervisor',
+    role: 'admin',
+    credits: 0
+  }
+];
+
+// 1. API สมัครสมาชิก
+app.post('/api/register', (req: Request, res: Response) => {
+  const { phone, password, name, role, avatarUrl } = req.body;
+
+  if (!phone || !password) {
+    return res.status(400).json({ success: false, message: 'กรุณากรอกเบอร์โทรและรหัสผ่าน' });
+  }
+
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const existingUser = usersDB.find(u => u.phone.replace(/[^0-9]/g, '') === cleanPhone);
+  if (existingUser) {
+    return res.status(400).json({ success: false, message: 'เบอร์โทรศัพท์นี้ลงทะเบียนไปแล้ว' });
+  }
+
+  const newUser: UserAccount = {
+    id: 'USR-' + Date.now(),
+    phone: cleanPhone,
+    password: password,
+    name: name || (role === 'client' ? 'ลูกค้าใหม่' : 'พาร์ทเนอร์ใหม่'),
+    role: role || 'client',
+    credits: role === 'client' ? 2500 : 0,
+    avatarUrl: avatarUrl || '',
+    kycStatus: role === 'partner' ? 'pending' : undefined
+  };
+
+  usersDB.push(newUser);
+
+  const { password: _, ...userSafe } = newUser;
+  return res.status(201).json({ success: true, message: 'ลงทะเบียนสำเร็จ', user: userSafe });
+});
+
+// 2. API ตรวจสอบรหัสผ่านตอนเข้าสู่ระบบ
+app.post('/api/login', (req: Request, res: Response) => {
+  const { phone, password } = req.body;
+
+  if (!phone || !password) {
+    return res.status(400).json({ success: false, message: 'กรุณากรอกเบอร์โทรและรหัสผ่าน' });
+  }
+
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const user = usersDB.find(u => u.phone.replace(/[^0-9]/g, '') === cleanPhone);
+
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'ไม่พบเบอร์โทรศัพท์นี้ในระบบ กรุณาสมัครสมาชิกก่อน' });
+  }
+
+  if (user.password !== password) {
+    return res.status(401).json({ success: false, message: 'รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง' });
+  }
+
+  const { password: _, ...userSafe } = user;
+  return res.json({ success: true, message: 'เข้าสู่ระบบสำเร็จ', user: userSafe });
+});
 // Production static serving or Vite dev middleware
 async function startServer() {
   if (process.env.NODE_ENV === 'production') {
