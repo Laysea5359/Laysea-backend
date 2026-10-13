@@ -196,9 +196,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
       alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์หลังบ้านได้ กรุณาลองใหม่อีกครั้ง');
     }
   };
-            role: selectedRole,
-            avatarUrl: finalAvatar
-          }),
+         
         });
 
         const data = await res.json();
