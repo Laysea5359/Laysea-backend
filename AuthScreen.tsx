@@ -127,7 +127,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isSignUp) {
@@ -149,17 +149,52 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
       avatarUrl ||
       (selectedRole === 'client' ? clientAvatars[0] : partnerAvatars[0]);
 
-    const session: UserSession = {
-      id: 'USR-' + Date.now(),
-      name: name || (selectedRole === 'client' ? 'คุณลูกค้าใหม่' : 'พาร์ทเนอร์ใหม่'),
-      role: selectedRole,
-      phone: phone || '081-234-5678',
-      avatarUrl: finalAvatar,
-      credits: selectedRole === 'client' ? 2500 : 0,
-      kycStatus: selectedRole === 'partner' ? 'pending' : undefined,
-    };
+    const BACKEND_URL = 'https://laysea-entertain-backend.onrender.com';
 
-    onLogin(session);
+    try {
+      if (isSignUp) {
+        // กรณีกดสมัครสมาชิกใหม่
+        const res = await fetch(`${BACKEND_URL}/api/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone,
+            password,
+            name,
+            role: selectedRole,
+            avatarUrl: finalAvatar
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.message || 'สมัครสมาชิกไม่สำเร็จ');
+          return;
+        }
+
+        alert('สมัครสมาชิกสำเร็จ ยินดีต้อนรับ!');
+        onLogin(data.user);
+      } else {
+        // กรณีกดเข้าสู่ระบบ (ส่งไปตรวจสอบรหัสผ่านจริง)
+        const res = await fetch(`${BACKEND_URL}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, password }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          // ถ้ารหัสผ่านผิด จะแจ้งเตือนและไม่ให้เข้าสู่ระบบ
+          alert(data.message || 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง');
+          return;
+        }
+
+        onLogin(data.user);
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+      alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์หลังบ้านได้ กรุณาลองใหม่อีกครั้ง');
+    }
   };
 
   // 1-Click Fast Demo accounts
