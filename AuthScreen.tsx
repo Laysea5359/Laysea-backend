@@ -197,71 +197,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
     }
   };
          
-        });
 
-        const data = await res.json();
-        if (!res.ok) {
-          alert(data.message || 'สมัครสมาชิกไม่สำเร็จ');
-          return;
-        }
-
-        alert('สมัครสมาชิกสำเร็จ ยินดีต้อนรับ!');
-        onLogin(data.user);
-      } else {
-        // กรณีกดเข้าสู่ระบบ (ส่งไปตรวจสอบรหัสผ่านจริง)
-        const res = await fetch(`${BACKEND_URL}/api/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, password }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-          // ถ้ารหัสผ่านผิด จะแจ้งเตือนและไม่ให้เข้าสู่ระบบ
-          alert(data.message || 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง');
-          return;
-        }
-
-        onLogin(data.user);
-      }
-    } catch (error) {
-      console.error('Auth error:', error);
-      alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์หลังบ้านได้ กรุณาลองใหม่อีกครั้ง');
-    }
-  };
-
-  // 1-Click Fast Demo accounts
-  const handleQuickDemoLogin = (role: UserRole) => {
-    if (role === 'client') {
-      onLogin({
-        id: 'USR-CLIENT-01',
-        name: 'คุณสมชาย นรินทร์',
-        role: 'client',
-        phone: '089-112-2334',
-        credits: 2500,
-        avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
-      });
-    } else if (role === 'partner') {
-      onLogin({
-        id: 'USR-PARTNER-01',
-        name: 'พิมพ์ชนก (น้องพิมพ์)',
-        role: 'partner',
-        phone: '084-556-7788',
-        credits: 38400,
-        partnerProfileId: 'partner-1',
-        kycStatus: 'verified',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      });
-    } else {
-      onLogin({
-        id: 'USR-ADMIN-01',
-        name: 'ผู้ดูแลระบบ (Super Admin)',
-        role: 'admin',
-        phone: '02-LAYSEA-SOS',
-        email: 'admin@laysea.com',
-      });
-    }
-  };
 
   return (
     <div className="flex-1 flex flex-col justify-between p-5 bg-slate-950 text-slate-100 overflow-y-auto relative">
