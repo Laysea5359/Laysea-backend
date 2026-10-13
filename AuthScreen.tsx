@@ -153,7 +153,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
 
     try {
       if (isSignUp) {
-        // กรณีกดสมัครสมาชิกใหม่
+        // โหมดสมัครสมาชิกใหม่
         const res = await fetch(`${BACKEND_URL}/api/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -161,6 +161,41 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
             phone,
             password,
             name,
+            role: selectedRole,
+            avatarUrl: finalAvatar
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.message || 'สมัครสมาชิกไม่สำเร็จ');
+          return;
+        }
+
+        alert('สมัครสมาชิกสำเร็จ ยินดีต้อนรับ!');
+        onLogin(data.user);
+      } else {
+        // โหมดเข้าสู่ระบบ (เช็กรหัสผ่านจริงกับ Render)
+        const res = await fetch(`${BACKEND_URL}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, password }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          // ถ้ารหัสผิด จะแจ้งเตือนและหยุดทันที ไม่ให้เข้าสู่ระบบ
+          alert(data.message || 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง');
+          return;
+        }
+
+        onLogin(data.user);
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+      alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์หลังบ้านได้ กรุณาลองใหม่อีกครั้ง');
+    }
+  };
             role: selectedRole,
             avatarUrl: finalAvatar
           }),
